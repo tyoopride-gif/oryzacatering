@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin – Oryza Katering</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body{padding-bottom:40px}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .login{max-width:340px;margin:12vh auto 0;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:var(--shadow);text-align:center}
+  .login h1{font-size:1.3rem;margin-bottom:14px}
+  .login input{margin-bottom:12px;text-align:center}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px}
+  .stat b{display:block;font-size:1.4rem}
+  .stat span{font-size:.78rem;color:var(--muted)}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .err{color:#dc2626;font-size:.88rem;margin-bottom:10px;min-height:1.2em}
+  .tbl-wrap table{min-width:820px}
+  .wa{color:var(--primary);font-weight:600;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login">
+  <h1>🔒 Admin Oryza Katering</h1>
+  <input id="pin" type="password" placeholder="PIN admin" autocomplete="current-password">
+  <div class="err" id="loginErr"></div>
+  <button class="btn" id="loginBtn" style="width:100%;padding:12px">Masuk</button>
+</div>
+
+<div id="appView" class="wrap" style="display:none">
+  <div class="top">
+    <h2>📋 Daftar Pemesan</h2>
+    <span>
+      <button class="mini" id="refreshBtn">🔄 Muat ulang</button>
+      <button class="mini" id="logoutBtn">Keluar</button>
+      <button class="mini danger" id="delAllBtn">Hapus semua</button>
+    </span>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="filters" id="filters"></div>
+  <div id="list"></div>
+  <small style="display:block;margin-top:10px;color:var(--muted)" id="updated"></small>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Samakan dengan API_URL di script.js
+const API_URL = "https://script.google.com/macros/s/AKfycbyd0eWwqYdu0wTzbOrZKHIWbJPt43FY44SybHzRcE1CvJ-g_3cTPFYh1i_ayE7eeqeW/exec";
+
+const rp = n => "Rp " + Number(n||0).toLocaleString("id-ID");
+const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtTgl = t => t ? t.split("-").reverse().join("/") : "-";
+const STATUS = {menunggu:"Menunggu bayar", bukti:"Bukti dikirim", lunas:"Lunas", kadaluarsa:"Kedaluwarsa"};
+const $ = id => document.getElementById(id);
+
+let pin = "", orders = [], filter = "semua", timer = null;
+try{ pin = sessionStorage.getItem("oryza_pin") || ""; }catch(e){}
+
+function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("show"),2200); }
+
+async function api(payload){
+  const r = await fetch(API_URL, {method:"POST", body:JSON.stringify(payload)});
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.error || "Gagal");
+  return j;
+}
+
+async function load(){
+  try{
+    const j = await api({action:"list", pin});
+    orders = j.orders || [];
+    $("updated").textContent = "Diperbarui " + new Date().toLocaleTimeString("id-ID");
+    render();
+    return true;
+  }catch(e){
+    if(e.message==="PIN salah") return false;
+    toast("Gagal memuat: " + e.message);
+    return true;
+  }
+}
+
+function waLink(hp){
+  let n = String(hp||"").replace(/\D/g,"");
+  if(n.startsWith("0")) n = "62" + n.slice(1);
+  return "https://wa.me/" + n;
+}
+
+function render(){
+  const count = s => orders.filter(o=>o.status===s).length;
+  const lunasTotal = orders.filter(o=>o.status==="lunas").reduce((s,o)=>s+(o.total||0),0);
+  $("stats").innerHTML =
+    `<div class="stat"><b>${orders.length}</b><span>Total pesanan</span></div>
+     <div class="stat"><b>${count("menunggu")}</b><span>Menunggu bayar</span></div>
+     <div class="stat"><b>${count("bukti")}</b><span>Perlu dicek (bukti)</span></div>
+     <div class="stat"><b>${count("lunas")}</b><span>Lunas</span></div>
+     <div class="stat"><b>${rp(lunasTotal)}</b><span>Pendapatan lunas</span></div>`;
+
+  const opts = [["semua","Semua"],["bukti","Perlu dicek"],["menunggu","Menunggu bayar"],["lunas","Lunas"],["kadaluarsa","Kedaluwarsa"]];
+  $("filters").innerHTML = opts.map(([k,l])=>`<button class="chip ${k===filter?"active":""}" data-f="${k}">${l}</button>`).join("");
+  $("filters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{ filter=b.dataset.f; render(); });
+
+  const list = orders.filter(o=>filter==="semua" || o.status===filter);
+  if(!list.length){ $("list").innerHTML = '<div class="empty">Tidak ada pesanan</div>'; return; }
+  $("list").innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>No</th><th>Nama</th><th>Alamat</th><th>No HP</th><th>Porsi</th><th>Tanggal</th><th>Pesanan / Catatan</th><th>Status</th><th></th></tr></thead>
+    <tbody>${list.map((o,i)=>`<tr>
+      <td>${i+1}</td>
+      <td><b>${esc(o.nama)}</b><br><small>${esc(o.kode)} · ${esc(o.jenis)} · ${esc(o.waktu)}</small></td>
+      <td>${esc(o.alamat)}</td>
+      <td><a class="wa" href="${waLink(o.hp)}" target="_blank" rel="noopener">${esc(o.hp)}</a></td>
+      <td>${esc(o.porsi)}</td>
+      <td>${fmtTgl(o.tgl)}</td>
+      <td>${esc(o.detail||"")}<br><small>Catatan: ${esc(o.catatan||"-")}</small></td>
+      <td><span class="st ${esc(o.status)}">${esc(STATUS[o.status]||o.status)}</span><br><small>${rp(o.total)}</small></td>
+      <td>${o.status==="lunas"||o.status==="kadaluarsa" ? "" : `<button class="mini" data-act="lunas" data-id="${Number(o.id)}">✔ Lunas</button> `}<button class="mini" data-act="del" data-id="${Number(o.id)}">Hapus</button></td>
+    </tr>`).join("")}</tbody></table></div>`;
+  $("list").querySelectorAll("button[data-act]").forEach(b=>b.onclick=()=>aksi(b.dataset.act, Number(b.dataset.id)));
+}
+
+async function aksi(act, id){
+  try{
+    if(act==="lunas") await api({action:"lunas", pin, id});
+    if(act==="del"){ if(!confirm("Hapus pesanan ini?")) return; await api({action:"delete", pin, id}); }
+    await load();
+  }catch(e){ toast("Gagal: " + e.message); }
+}
+
+function tampilApp(){
+  $("loginView").style.display = "none";
+  $("appView").style.display = "block";
+  clearInterval(timer); timer = setInterval(load, 60000);
+}
+function keluar(){
+  pin = ""; try{ sessionStorage.removeItem("oryza_pin"); }catch(e){}
+  clearInterval(timer); orders = [];
+  $("appView").style.display = "none";
+  $("loginView").style.display = "block";
+  $("pin").value = "";
+}
+
+async function masuk(){
+  const p = $("pin").value || pin;
+  if(!p){ $("loginErr").textContent = "Masukkan PIN"; return; }
+  $("loginBtn").disabled = true; $("loginErr").textContent = "";
+  pin = p;
+  const ok = await load();
+  $("loginBtn").disabled = false;
+  if(!ok){ pin = ""; $("loginErr").textContent = "PIN salah"; return; }
+  try{ sessionStorage.setItem("oryza_pin", pin); }catch(e){}
+  tampilApp();
+}
+
+$("loginBtn").onclick = masuk;
+$("pin").addEventListener("keydown", e=>{ if(e.key==="Enter") masuk(); });
+$("refreshBtn").onclick = load;
+$("logoutBtn").onclick = keluar;
+$("delAllBtn").onclick = async ()=>{
+  if(!orders.length || !confirm("Hapus SEMUA pesanan? Tidak bisa dibatalkan.")) return;
+  try{ await api({action:"deleteAll", pin}); await load(); }catch(e){ toast("Gagal: "+e.message); }
+};
+
+if(pin) masuk();
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+:root{
+  --bg:#e8edeb; --surface:#f7fbf9; --text:#2b2118; --muted:#7a6a5b;
+  --primary:#00983a; --primary-d:#cb3705; --accent:#10c331; --border:#efe3d3;
+  --shadow:0 4px 14px rgba(120,70,20,.10);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1510; --surface:#26201a; --text:#f5ebe0; --muted:#b7a794;
+    --primary:#f97316; --primary-d:#ea580c; --accent:#fbbf24; --border:#3a3027;
+    --shadow:0 4px 14px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.container{max-width:1100px;margin:0 auto;padding:0 16px}
+
+/* Header */
+header{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:36px 0 44px;text-align:center}
+header h1{font-size:clamp(1.8rem,5vw,2.8rem);letter-spacing:.5px}
+header p{opacity:.95;margin-top:6px}
+.cart-btn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--primary);color:#fff;border:none;border-radius:999px;padding:14px 20px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+.cart-btn .badge{background:#fff;color:var(--primary);border-radius:999px;padding:2px 9px;margin-left:8px;font-size:.85rem}
+
+/* Tabs */
+nav.tabs{display:flex;gap:8px;justify-content:center;margin:-22px auto 0;flex-wrap:wrap;padding:0 16px}
+.tab{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:999px;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+.tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+section.page{display:none;padding:28px 0 90px}
+section.page.active{display:block}
+
+/* Filter */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.toolbar input{flex:1 1 220px;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:1rem}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:999px;cursor:pointer;font-size:.9rem}
+.chip.active{background:var(--accent);color:#2b2118;border-color:var(--accent);font-weight:600}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.card .emoji{font-size:3.6rem;text-align:center;padding:22px 0 10px;background:linear-gradient(180deg,rgba(245,158,11,.14),transparent)}
+.card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:1.05rem}
+.card .cat{font-size:.75rem;color:var(--primary);font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.card p{font-size:.88rem;color:var(--muted);flex:1}
+.card .row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.price{font-weight:700;font-size:1.05rem}
+.btn{background:var(--primary);color:#fff;border:none;padding:9px 16px;border-radius:10px;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--primary-d)}
+.btn.ghost{background:transparent;color:var(--primary);border:1px solid var(--primary)}
+.empty{text-align:center;color:var(--muted);padding:40px 0}
+
+/* Paket katering */
+.paket{border:2px solid var(--border);border-radius:18px;background:var(--surface);padding:22px;box-shadow:var(--shadow);position:relative}
+.paket.pop{border-color:var(--primary)}
+.paket .tag{position:absolute;top:-12px;right:16px;background:var(--primary);color:#fff;font-size:.75rem;padding:4px 12px;border-radius:999px;font-weight:700}
+.paket h3{font-size:1.25rem}
+.paket .harga{font-size:1.7rem;font-weight:800;color:var(--primary);margin:8px 0 2px}
+.paket small{color:var(--muted)}
+.paket ul{list-style:none;margin:14px 0 18px}
+.paket li{padding:5px 0 5px 26px;position:relative;font-size:.92rem}
+.paket li::before{content:"✓";position:absolute;left:0;color:var(--primary);font-weight:800}
+.paket .btn{width:100%;padding:12px}
+
+/* Form */
+.form{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;box-shadow:var(--shadow);margin-top:28px}
+.form h3{margin-bottom:14px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+label{display:block;font-size:.85rem;font-weight:600;margin-bottom:4px}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font:inherit}
+textarea{resize:vertical;min-height:80px}
+
+/* Cart drawer */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:60}
+.overlay.show{display:block}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--surface);z-index:70;transform:translateX(100%);transition:.3s;display:flex;flex-direction:column;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.drawer.show{transform:none}
+.drawer header{background:none;color:var(--text);padding:0 0 12px;display:flex;justify-content:space-between;align-items:center;text-align:left;border-bottom:1px solid var(--border)}
+.drawer header h2{font-size:1.2rem}
+.close{background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text)}
+.items{flex:1;overflow-y:auto;padding:10px 0}
+.item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--border)}
+.item .info{flex:1}
+.item .info b{display:block;font-size:.95rem}
+.item .info span{font-size:.82rem;color:var(--muted)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-weight:700}
+.total{display:flex;justify-content:space-between;font-weight:800;font-size:1.15rem;padding:12px 0}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;opacity:0;transition:.3s;z-index:90;pointer-events:none;font-size:.9rem}
+.toast.show{opacity:1;transform:translateX(-50%)}
+footer{text-align:center;color:var(--muted);padding:24px 16px 100px;font-size:.88rem;border-top:1px solid var(--border)}
+
+/* Metode pembayaran */
+.pay{max-height:42vh;overflow-y:auto}
+.pay>label{display:block;font-size:.85rem;font-weight:600;margin:10px 0 6px}
+.pay-title{font-size:.85rem;font-weight:600;margin-bottom:6px}
+.pay-group{margin-bottom:10px}
+.pay-group>span{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:5px}
+.pay-opts{display:flex;flex-wrap:wrap;gap:8px}
+.pay-opt{border:1px solid var(--border);background:var(--bg);color:var(--text);padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.9rem;font-weight:600}
+.pay-opt.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pay-detail{background:var(--bg);border:1px dashed var(--primary);border-radius:12px;padding:12px 14px;margin-top:6px;font-size:.88rem}
+.pay-detail b{font-size:1.05rem;letter-spacing:.5px}
+.pay-detail .copy{margin-left:8px;background:none;border:1px solid var(--primary);color:var(--primary);border-radius:8px;padding:3px 10px;cursor:pointer;font-size:.78rem;font-weight:600}
+.pay-detail img{display:block;width:200px;max-width:100%;margin:8px auto;border-radius:10px;background:#fff}
+.pay-detail small{display:block;color:var(--muted);margin-top:6px}
+
+/* Drawer scroll + data pemesan */
+.drawer-scroll{flex:1;overflow-y:auto;padding-right:2px}
+.drawer .items{flex:none;overflow:visible}
+.drawer .pay{max-height:none}
+.cust{display:grid;gap:8px;margin:10px 0}
+.cust textarea{min-height:60px}
+
+/* Daftar pemesan */
+.orders{margin-top:44px;padding-top:24px;border-top:1px solid var(--border)}
+.orders h2{margin-bottom:14px}
+.lock{background:var(--surface);border:1px dashed var(--border);border-radius:14px;padding:22px;text-align:center;color:var(--muted)}
+.lock p{margin-bottom:12px}
+.ord-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.tbl-wrap table{width:100%;min-width:760px;border-collapse:collapse;font-size:.88rem}
+.tbl-wrap th{background:var(--bg);text-align:left;padding:10px 12px;font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.tbl-wrap td{padding:10px 12px;border-top:1px solid var(--border);vertical-align:top}
+.tbl-wrap small{color:var(--muted)}
+.mini{border:1px solid var(--border);background:var(--bg);color:var(--text);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:.8rem}
+.mini.danger{color:#dc2626;border-color:#dc2626}
+/* Foto menu & QRIS */
+.card .photo{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--border)}
+.pay-detail img{width:260px}
+/* Pembayaran QRIS (muncul setelah pesan) */
+.banner{display:none;max-width:1100px;margin:16px auto 0;padding:12px 16px;background:#fff4d6;color:#5a4300;border:1px solid #f0cf73;border-radius:12px;font-size:.92rem;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.banner.show{display:flex}
+.note{background:var(--bg);border:1px dashed var(--primary);border-radius:12px;padding:12px 14px;font-size:.88rem;color:var(--muted);margin-top:10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:100;align-items:center;justify-content:center;padding:16px}
+.modal.show{display:flex}
+.modal-box{background:var(--surface);color:var(--text);border-radius:18px;padding:22px;width:min(420px,100%);max-height:92vh;overflow-y:auto;text-align:center}
+.modal-box h3{margin-bottom:6px}
+.modal-box img{width:260px;max-width:100%;margin:10px auto;display:block;border-radius:10px;background:#fff}
+.modal-box .timer{font-size:1.7rem;font-weight:800;color:#dc2626;margin:6px 0;font-variant-numeric:tabular-nums}
+.modal-box .big{font-size:1.3rem;font-weight:800;color:var(--primary)}
+.modal-box .btn{width:100%;padding:12px;margin-top:8px}
+.modal-box small{display:block;color:var(--muted);margin-top:8px}
+.st{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:700}
+.st.menunggu{background:#fff4d6;color:#8a6200}
+.st.bukti{background:#dbeafe;color:#1d4ed8}
+.st.lunas{background:#dcfce7;color:#166534}
+.st.kadaluarsa{background:#fee2e2;color:#b91c1c}
+/* Logo di header */
+.brand{display:flex;align-items:center;justify-content:center;gap:16px}
+.brand .logo{height:clamp(72px,16vw,104px);width:auto;flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.25))}
+.brand-text{text-align:left}
+@media (max-width:420px){.brand{gap:10px}.brand-text p{font-size:.85rem}}

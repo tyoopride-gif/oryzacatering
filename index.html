@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oryza Katering – Menu &amp; Daftar Katering</title>
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="container brand">
+    <img class="logo" src="logo.png" alt="Logo Oryza Catering">
+    <div class="brand-text">
+      <h1>Oryza Katering</h1>
+      <p>Menu makanan lezat &amp; paket katering untuk setiap acara</p>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="menu">Menu Makanan</button>
+  <button class="tab" data-tab="katering">Daftar Katering</button>
+</nav>
+
+<div class="banner" id="payBanner"></div>
+
+<main class="container">
+  <!-- MENU -->
+  <section id="menu" class="page active">
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Cari menu… (mis. rendang)">
+    </div>
+    <div class="chips" id="chips" style="margin-bottom:20px"></div>
+    <div class="grid" id="menuGrid"></div>
+    <div class="empty" id="empty" style="display:none">Menu tidak ditemukan 😢</div>
+  </section>
+
+  <!-- KATERING -->
+  <section id="katering" class="page">
+    <h2 style="margin-bottom:6px">Paket Katering</h2>
+    <p style="color:var(--muted);margin-bottom:24px">Harga per porsi. Minimal pemesanan sesuai paket.</p>
+    <div class="grid" id="paketGrid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))"></div>
+
+    <form class="form" id="orderForm">
+      <h3>📋 Pesan Katering</h3>
+      <div class="fgrid">
+        <div><label>Nama</label><input name="nama" required placeholder="Nama lengkap"></div>
+        <div><label>No. WhatsApp</label><input name="hp" required inputmode="tel" placeholder="08xxxxxxxxxx"></div>
+        <div><label>Paket</label><select name="paket" id="paketSelect"></select></div>
+        <div><label>Jumlah Porsi</label><input type="number" name="porsi" id="porsi" min="1" value="1" required></div>
+        <div><label>Tanggal Acara</label><input type="date" name="tgl" required></div>
+        <div><label>Alamat Pengiriman</label><input name="alamat" required placeholder="Alamat lengkap"></div>
+      </div>
+      <div style="margin-top:14px"><label>Catatan</label><textarea name="catatan" placeholder="Alergi, request menu, dll."></textarea></div>
+      <p style="margin:14px 0;font-weight:700">Estimasi total: <span id="estimasi" style="color:var(--primary)">Rp 0</span></p>
+      <p class="note">Pembayaran hanya lewat QRIS</p>
+      <button class="btn" type="submit" style="width:100%;padding:13px;margin-top:12px">Pesan &amp; Bayar</button>
+    </form>
+  </section>
+</main>
+
+<footer>© 2026 Oryza Katering · Buka setiap hari 07.00 – 21.00 · WA 0895-3604-11714</footer>
+
+<button class="cart-btn" id="cartBtn">🛒 Keranjang <span class="badge" id="cartCount">0</span></button>
+<div class="overlay" id="overlay"></div> 
+
+<aside class="drawer" id="drawer">
+  <header><h2>Keranjang Pesanan</h2><button class="close" id="closeCart" aria-label="Tutup">×</button></header>
+  <div class="drawer-scroll">
+    <div class="items" id="cartItems"></div>
+    <div class="cust">
+      <div class="pay-title">Data Pemesan</div>
+      <input id="cNama" placeholder="Nama lengkap" autocomplete="name">
+      <input id="cHp" inputmode="tel" placeholder="No. HP / WhatsApp" autocomplete="tel">
+      <textarea id="cAlamat" placeholder="Alamat pengiriman" autocomplete="street-address"></textarea>
+      <input id="cTgl" type="date" title="Tanggal pesanan / acara">
+      <textarea id="cCatatan" placeholder="Catatan (opsional)"></textarea>
+    </div>
+    <p class="note">Pembayaran via QRIS akan muncul setelah pesanan dikirim.</p>
+  </div>
+  <div class="total"><span>Total</span><span id="cartTotal">Rp 0</span></div>
+  <button class="btn" id="checkout" style="padding:13px">Pesan &amp; Bayar</button>
+</aside>
+
+<div class="modal" id="payModal">
+  <div class="modal-box" id="payModalBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
